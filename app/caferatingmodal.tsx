@@ -315,7 +315,7 @@ export function CafeRatingModal({ isOpen, onClose, onSubmit }) {
                 {/* Header with gradient */}
                 <div className="bg-gradient-to-r from-violet-600 to-amber-500 px-6 pt-6 pb-4">
                     <div className="flex items-center justify-between gap-4">
-                        <h2 className="text-white text-2xl font-bold">Rate a Cafe</h2>
+                        <h2 className="text-white text-2xl font-bold">rate cafe</h2>
                         <button
                             onClick={onClose}
                             className="flex-shrink-0 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white text-lg transition-colors"
