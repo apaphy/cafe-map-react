@@ -5,6 +5,7 @@ export function LocationModal({ isOpen, location, onClose })
 {    
     const [ currentReview, setCurrentReview ] = useState(null)
     const [ currentImageIndex, setCurrentImageIndex ] = useState(0);
+    const [ currentReviewIndex, setCurrentReviewIndex ] = useState(0);
     
     const handleNextImage = () => {
         if (currentReview != null && currentReview["review-images"] != null) {
@@ -20,16 +21,15 @@ export function LocationModal({ isOpen, location, onClose })
 
     useEffect(() =>
     {
-        setCurrentReview(location?.reviews[ 0 ])
+        setCurrentReview(location?.reviews?.[currentReviewIndex] || null)
         setCurrentImageIndex(0)
-    }, [location])
+    }, [location, currentReviewIndex])
     
     return (
-        <>
-
+        <div className="fixed top-0 right-0 z-50 transition-transform duration-300 ease-out transform m-4 gap-5">
             {/* Modal */}
             <div
-                className={`fixed top-0 right-0 bg-white shadow-2xl z-50 transition-transform duration-300 ease-out transform m-4 rounded-3xl overflow-hidden ${
+                className={`bg-white shadow-2xl rounded-3xl overflow-hidden ${
                     isOpen ? "translate-x-0" : "translate-x-[calc(100%+40px)]"
                 }`}
                 style={{ maxHeight: "90vh", maxWidth: "450px", width: "100%" }}
@@ -89,6 +89,18 @@ export function LocationModal({ isOpen, location, onClose })
                                     }
                                 </div>
                             )}
+                            
+                            {/* Date Visited */}
+                            <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-4">
+                                <div className="flex items-center justify-between">
+                                    <h4 className="text-gray-800 text-sm font-bold uppercase tracking-wide">Date Visited</h4>
+                                    <p className="text-gray-600 text-sm font-medium">{new Date(currentReview["date-of-visit"]).toLocaleDateString('en-US', { 
+                                        year: 'numeric', 
+                                        month: 'long', 
+                                        day: 'numeric' 
+                                    })}</p>
+                                </div>
+                            </div>
 
                             {/* Ratings Bars */}
                             {currentReview.ratings && Object.keys(currentReview.ratings).length > 0 && (
@@ -135,7 +147,30 @@ export function LocationModal({ isOpen, location, onClose })
                         </div>
                     )}
                 </div>
+
             </div>
-        </>
+            {/* Review Navigation */}
+            {location?.reviews && location.reviews.length > 1 && (
+                <div className="px-6 pt-6">
+                    <div className="flex items-center justify-between gap-3">
+                        <button
+                            onClick={() => setCurrentReviewIndex((prev) => (prev - 1 + location.reviews.length) % location.reviews.length)}
+                            className="flex-1 px-3 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-lg font-semibold text-sm transition-all active:scale-95"
+                        >
+                            ← Previous
+                        </button>
+                        <span className="text-gray-500 text-xs font-medium px-3 py-2 bg-gray-100 rounded-lg">
+                            {currentReviewIndex + 1} / {location.reviews.length}
+                        </span>
+                        <button
+                            onClick={() => setCurrentReviewIndex((prev) => (prev + 1) % location.reviews.length)}
+                            className="flex-1 px-3 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-lg font-semibold text-sm transition-all active:scale-95"
+                        >
+                            Next →
+                        </button>
+                    </div>
+                </div>
+            )}
+        </div>
     );
 }
