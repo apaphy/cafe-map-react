@@ -15,7 +15,8 @@ module.exports = {
     ],
     deviceSizes: [400, 640, 750, 828],  // Your modal is 400px max
     imageSizes: [400],
-    formats: ['image/avif', 'image/webp'],  // Modern formats = smaller files
+    formats: [ 'image/avif', 'image/webp' ],  // Modern formats = smaller files
+    crossOrigin: 'use-credentials',
   }
 }
 
