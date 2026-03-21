@@ -53,3 +53,29 @@ export async function fetchCafeReviews() {
         throw error;
     }
 }
+
+export async function fetchRatingCategories() {
+    const supabase = await createSupabaseServer()
+
+    try {
+        const { data: categories, error } = await supabase
+            .from('rating-categories')
+            .select('id, category, max-value, min-value')
+        
+        if (error) {
+            console.error("Error fetching rating categories:", error);
+            throw error;
+        }
+
+        // Transform the data to match the expected format
+        return categories.map(cat => ({
+            id: cat.id,
+            category: cat.category,
+            min: cat['min-value'],
+            max: cat['max-value']
+        }));
+    } catch (error) {
+        console.error("Error loading rating categories:", error);
+        throw error;
+    }
+}

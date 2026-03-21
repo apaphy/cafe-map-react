@@ -3,6 +3,7 @@ import { AdvancedMarker, APIProvider, Map } from "@vis.gl/react-google-maps";
 import React, { useContext, useEffect, useState } from "react";
 import { useQuery } from '@tanstack/react-query';
 import { LocationModal } from "./locationmodal";
+import { CafeRatingModal } from "./caferatingmodal";
 import { fetchCafeReviews } from "@/app/supabase/cafe"
 import { AuthContext } from "@/app/supabase/client"
 
@@ -39,6 +40,7 @@ export default function Home() {
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
     const [ selectedLocation, setSelectedLocation ] = useState(null);
     const [ locationModalOpen, setLocationModelOpen ] = useState(false);
+    const [ cafeRatingModalOpen, setCafeRatingModalOpen ] = useState(false);
 
     if (!apiKey) {
         throw new Error("Missing Google Maps API key in environment variables.");
@@ -91,10 +93,27 @@ export default function Home() {
                 ))}
                 </Map>
             </APIProvider>
+
+            {/* Plus Button */}
+            <button
+                onClick={() => setCafeRatingModalOpen(true)}
+                className="fixed bottom-6 left-6 w-14 h-14 bg-gradient-to-r from-violet-600 to-amber-500 hover:from-violet-700 hover:to-amber-600 text-white rounded-full shadow-lg flex items-center justify-center text-2xl font-bold transition-all active:scale-95 z-40"
+                aria-label="Add cafe rating"
+            >
+                +
+            </button>
+
             <LocationModal 
                 isOpen={locationModalOpen}
                 location={selectedLocation}
                 onClose={() => setLocationModelOpen(false)}
+            />
+            <CafeRatingModal 
+                isOpen={cafeRatingModalOpen}
+                onClose={() => setCafeRatingModalOpen(false)}
+                onSubmit={async (data) => {
+                    locations.push(data)
+                }}
             />
         </div>
     );
