@@ -24,9 +24,14 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="h-screen">
+      <head>
+        {/* Preconnect to Supabase CDN for faster image loading */}
+        <link rel="preconnect" href="https://jngvduzxuimqrgjosugu.supabase.co" />
+        <link rel="dns-prefetch" href="https://jngvduzxuimqrgjosugu.supabase.co" />
+      </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased h-screen`}
       >
         <Providers>{children}</Providers>
       </body>

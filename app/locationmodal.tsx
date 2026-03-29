@@ -1,35 +1,54 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
+import { preloadAdjacentImages, preloadAllReviewImages } from "@/app/utils/imagePreloader";
 
 export function LocationModal({ isOpen, location, onClose })
 {    
     const [ currentReview, setCurrentReview ] = useState(null)
     const [ currentImageIndex, setCurrentImageIndex ] = useState(0);
     const [ currentReviewIndex, setCurrentReviewIndex ] = useState(0);
+    const [ imageLoading, setImageLoading ] = useState(true);
     
     const handleNextImage = () => {
         if (currentReview != null && currentReview["review-images"] != null) {
+            setImageLoading(true);
             setCurrentImageIndex((prev) => (prev + 1) % currentReview["review-images"].length);
         }
     };
     
     const handlePrevImage = () => {
         if (currentReview != null && currentReview["review-images"] != null) {
+            setImageLoading(true);
             setCurrentImageIndex((prev) => (prev - 1 + currentReview["review-images"].length) % currentReview["review-images"].length);
         }
+    };
+
+    const handleImageLoad = () => {
+        setImageLoading(false);
     };
 
     useEffect(() =>
     {
         setCurrentReview(location?.reviews?.[currentReviewIndex] || null)
         setCurrentImageIndex(0)
-    }, [location, currentReviewIndex])
+        // Preload all images when review changes
+        if (location?.reviews?.[currentReviewIndex]?.["review-images"]) {
+            preloadAllReviewImages(location.reviews[currentReviewIndex]["review-images"]);
+        }
+    }, [location, currentReviewIndex]);
+
+    // Preload adjacent images when current image changes
+    useEffect(() => {
+        if (currentReview?.["review-images"]) {
+            preloadAdjacentImages(currentReview["review-images"], currentImageIndex, 2);
+        }
+    }, [currentImageIndex, currentReview])
     
     return (
         <div className="fixed top-0 right-0 z-50 transition-transform duration-300 ease-out transform m-4 gap-5">
             {/* Modal */}
             <div
-                className={`bg-white shadow-2xl rounded-3xl overflow-hidden ${
+                className={`bg-white shadow-2xl rounded-3xl overflow-hidden transition-transform duration-300 ease-out ${
                     isOpen ? "translate-x-0" : "translate-x-[calc(100%+40px)]"
                 }`}
                 style={{ maxHeight: "90vh", maxWidth: "450px", width: "100%" }}
@@ -56,13 +75,18 @@ export function LocationModal({ isOpen, location, onClose })
                             {currentReview && currentReview["review-images"].length > 0 && (
                                 <div>
                                     <div className="relative w-full aspect-square bg-gray-200 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-shadow">
+                                        {/* Loading Skeleton */}
+                                        {imageLoading && (
+                                            <div className="absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-pulse" />
+                                        )}
                                         <Image 
                                             src={currentReview["review-images"][currentImageIndex].src} 
                                             alt="gallery"
                                             fill
                                             sizes="(max-width: 450px) 100vw"
-                                            priority={currentImageIndex === 0}
-                                            className="object-cover"
+                                            priority={true}
+                                            onLoad={handleImageLoad}
+                                            className={`object-cover transition-opacity duration-200 ${imageLoading ? 'opacity-0' : 'opacity-100'}`}
                                         />
                                     </div>
                                     
